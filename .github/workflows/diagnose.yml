@@ -1,0 +1,31 @@
+name: Diagnose
+# Calls the live functions the way the browser does and prints what comes back.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose.yml']
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          REF=$(tr -d ' \n' < supabase/project-ref)
+          URL="https://$REF.supabase.co/functions/v1"
+          KEY=$(curl -sS "https://api.supabase.com/v1/projects/$REF/api-keys" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            | jq -r 'map(select(.name == "anon" or .type == "publishable")) | (map(select(.name == "anon")) + .)[0].api_key // empty')
+          echo "key type: $(echo "$KEY" | cut -c1-6)..."
+          echo "deployed site config:"; curl -sS "https://peequeue.github.io/team-dice-race/config.js" | sed 's/anonKey: .\(......\).*/anonKey: \1.../'
+          for fn in admin play; do
+            echo; echo "=== $fn OPTIONS (preflight)"
+            curl -sS -o /dev/null -D - -X OPTIONS "$URL/$fn" -H "Origin: https://peequeue.github.io" \
+              -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type, apikey, authorization" | grep -iE "^HTTP|access-control" || true
+            echo "=== $fn POST"
+            H=(-H "Content-Type: application/json" -H "Origin: https://peequeue.github.io" -H "apikey: $KEY")
+            case "$KEY" in eyJ*) H+=(-H "Authorization: Bearer $KEY");; esac
+            curl -sS -D - "$URL/$fn" "${H[@]}" -d '{"action":"overview"}' | grep -viE "^(date|server|vary|x-|sb-|cf-|alt-svc|strict|content-length)" | head -20
+          done
