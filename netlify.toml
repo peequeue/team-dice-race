@@ -1,0 +1,11 @@
+# Netlify hosting with a same-site relay to Supabase, for networks that block supabase.co.
+# The browser only ever talks to this site; /api/* is passed through to the Edge Functions.
+[build]
+  command = "npm ci && npm run build"
+  publish = "web"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://ygleqpvebbequbimfgvx.supabase.co/functions/v1/:splat"
+  status = 200
+  force = true
