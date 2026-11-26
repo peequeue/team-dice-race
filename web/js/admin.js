@@ -160,15 +160,20 @@ function renderBoard(s) {
 
 function renderWyr() {
   const unused = data.wyr.filter((q) => !q.used_date);
-  $('wyrCount').textContent = `${unused.length} unused`;
+  const todo = unused.filter((q) => !q.answer).length;
+  $('wyrCount').innerHTML = `${unused.length - todo} ready${todo ? `, <b class="warn">${todo} need your answer</b>` : ''}`;
+  const pick = (q, side) => q.used_date
+    ? (q.answer === side ? '&#10003;' : '')
+    : `<button class="btn small ${q.answer === side ? 'gold' : 'ghost'}" data-ans="${side}" data-id="${q.id}">${side === 'a' ? 'A' : 'B'}</button>`;
   $('wyrList').innerHTML = `<table><tr><th>Question</th><th>A</th><th>B</th><th>Pick</th><th>Used</th><th></th></tr>
     ${data.wyr.map((q) => `<tr><td>${esc(q.question)}</td><td>${esc(q.option_a)}</td><td>${esc(q.option_b)}</td>
-      <td>${q.answer.toUpperCase()}</td><td>${q.used_date ?? '-'}</td>
+      <td style="white-space:nowrap">${pick(q, 'a')} ${pick(q, 'b')}</td><td>${q.used_date ?? '-'}</td>
       <td>${q.used_date ? '' : `<button class="btn small red" data-del="${q.id}">X</button>`}</td></tr>`).join('')}</table>`;
   $('wyrList').querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => act('wyr_delete', { id: b.dataset.del })));
+  $('wyrList').querySelectorAll('[data-ans]').forEach((b) => (b.onclick = () => act('wyr_answer', { id: b.dataset.id, answer: b.dataset.ans })));
   $('wyrAdd').onclick = async () => {
     const r = await act('wyr_add', { bulk: $('wyrBulk').value });
-    if (r) { $('wyrBulk').value = ''; toast(`Added ${r.added}`); }
+    if (r) { $('wyrBulk').value = ''; toast(r.unanswered ? `Added ${r.added}. Pick your answer (A or B) for each in the table.` : `Added ${r.added}`); }
   };
 }
 

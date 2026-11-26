@@ -65,7 +65,11 @@ jobs:
           end \$\$;
           SQL
           q /tmp/vault.sql
-          q supabase/migrations/0002_cron.sql
+          # Every later migration is written to be safe to run again.
+          for f in supabase/migrations/0*.sql; do
+            case "$f" in */0001_*) continue;; esac
+            echo "Running $f"; q "$f"
+          done
           echo "Vault and hourly job set."
 
       - name: Function settings

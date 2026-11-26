@@ -107,7 +107,7 @@ async function resolveOne(tx: Sql, season: Season, date: string) {
   const lockIns = (await tx`select * from lock_ins where season_id = ${season.id} and game_date = ${date}`).map(toLockIn);
   const [ev] = await tx`select event_key from daily_events where season_id = ${season.id} and game_date = ${date}`;
   const available = (await tx`
-    select id, question, option_a, option_b from wyr_questions where used_season_id is null`)
+    select id, question, option_a, option_b from wyr_questions where used_season_id is null and answer is not null`)
     .map((q): WyrQuestion => ({ id: q.id, question: q.question, optionA: q.option_a, optionB: q.option_b }));
   const pendingIds = players.map((p) => p.pendingDecision?.wyr?.id).filter((x): x is string => !!x);
   const answers: Record<string, 'a' | 'b'> = {};

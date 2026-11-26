@@ -93,6 +93,13 @@ serve(async (body, req) => {
     case 'wyr_add':
       return await wyrAdd(body);
 
+    case 'wyr_answer': {
+      const ans = String(body.answer ?? '');
+      if (!['a', 'b'].includes(ans)) throw new HttpError(400, 'Answer must be a or b');
+      await sql`update wyr_questions set answer = ${ans} where id = ${String(body.id)} and used_season_id is null`;
+      return { ok: true };
+    }
+
     case 'wyr_delete':
       await sql`delete from wyr_questions where id = ${String(body.id)} and used_season_id is null`;
       return { ok: true };
@@ -199,7 +206,8 @@ async function wyrAdd(body: Record<string, unknown>) {
   if (typeof body.bulk === 'string') {
     for (const line of body.bulk.split('\n').map((l) => l.trim()).filter(Boolean)) {
       const [q, a, b, ans] = line.split('|').map((x) => x.trim());
-      items.push({ q, a, b, ans: (ans ?? '').toLowerCase() });
+      if (/^question$/i.test(q ?? '') && /^option a$/i.test(a ?? '')) continue; // the format line, pasted by mistake
+      items.push({ q, a, b, ans: (ans ?? '').toLowerCase().replace(/[^ab]/g, '').slice(0, 1) });
     }
   } else {
     items.push({
@@ -207,10 +215,11 @@ async function wyrAdd(body: Record<string, unknown>) {
       ans: String(body.answer ?? '').toLowerCase(),
     });
   }
-  const bad = items.findIndex((i) => !i.q || !i.a || !i.b || !['a', 'b'].includes(i.ans));
-  if (bad >= 0) throw new HttpError(400, `Line ${bad + 1} needs: question | option A | option B | a or b`);
+  // The answer is optional here: anything but a or b is left blank, to be picked in the table.
+  const bad = items.findIndex((i) => !i.q || !i.a || !i.b);
+  if (bad >= 0) throw new HttpError(400, `Line ${bad + 1} needs at least: question | option A | option B`);
   for (const i of items) {
-    await sql`insert into wyr_questions (question, option_a, option_b, answer) values (${i.q}, ${i.a}, ${i.b}, ${i.ans})`;
+    await sql`insert into wyr_questions (question, option_a, option_b, answer) values (${i.q}, ${i.a}, ${i.b}, ${i.ans || null})`;
   }
-  return { added: items.length };
+  return { added: items.length, unanswered: items.filter((i) => !i.ans).length };
 }
