@@ -21,7 +21,7 @@ Done: the code is at github.com/peequeue/team-dice-race (public, which keeps Git
 ## 2. Create the Supabase project
 
 1. Sign up at supabase.com (free plan).
-2. **New project**. Name: `team-dice-race`. Region: **Sydney**. Set a database password (save it, though you won't need it day to day). Under data access, choose **Only Connection String** (the game doesn't use the Data API); if offered, turn on automatic RLS.
+2. **New project**. Name: `team-dice-race`. Region: **Sydney**. Set a database password (save it, though you won't need it day to day). Under **Data access**: untick **Enable Data API**, leave **Grant API access to new tables automatically** unticked, and tick **Enable RLS on new tables automatically**. The game never uses the Data API.
 3. Wait a minute or two for it to finish setting up.
 
 ## 3. Set up the database
