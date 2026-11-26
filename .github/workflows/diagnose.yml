@@ -1,5 +1,5 @@
 name: Diagnose
-# Calls the live functions the way the browser does and prints what comes back.
+# Calls the live functions (direct and through the Netlify relay) the way the browser does.
 on:
   workflow_dispatch:
   push:
