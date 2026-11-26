@@ -29,6 +29,9 @@ jobs:
             case "$KEY" in eyJ*) H+=(-H "Authorization: Bearer $KEY");; esac
             curl -sS -D - "$URL/$fn" "${H[@]}" -d '{"action":"overview"}' | grep -viE "^(date|server|vary|x-|sb-|cf-|alt-svc|strict|content-length)" | head -20
           done
-          echo; echo "=== play POST with no key at all"
-          curl -sS -o /dev/null -w "%{http_code}\n" "$URL/play" -H "Content-Type: application/json" -d '{"action":"overview"}'
-          curl -sS "$URL/play" -H "Content-Type: application/json" -d '{"action":"overview"}'; echo
+          echo; echo "=== Netlify relay"
+          for site in team-dice-race.netlify.app; do
+            echo "-- $site page: $(curl -sS -o /dev/null -w '%{http_code}' https://$site/admin.html)"
+            echo "-- $site config: $(curl -sS https://$site/config.js | grep functionsUrl)"
+            echo "-- $site relay: $(curl -sS -X POST https://$site/api/play -H 'Content-Type: application/json' -d '{"action":"overview"}')"
+          done
