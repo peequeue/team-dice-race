@@ -26,6 +26,22 @@ jobs:
       - run: npm test
       - run: node engine/sim/simulate.ts 300
       - run: npm run build
+      - name: Read project ref
+        run: |
+          REF="${{ vars.SUPABASE_PROJECT_REF }}"
+          [ -n "$REF" ] || REF=$(tr -d ' \n' < supabase/project-ref 2>/dev/null || true)
+          echo "REF=$REF" >> "$GITHUB_ENV"
+      - name: Point the site at Supabase
+        if: github.event_name != 'pull_request' && env.REF != ''
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          # Only the public key is used. The anon (or publishable) key is designed to be public.
+          KEY=$(curl -sS --fail-with-body "https://api.supabase.com/v1/projects/$REF/api-keys" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            | jq -r 'map(select(.name == "anon" or .type == "publishable")) | (map(select(.name == "anon")) + .)[0].api_key // empty')
+          if [ -z "$KEY" ]; then echo "::error::Couldn't read the public key. Check SUPABASE_ACCESS_TOKEN."; exit 1; fi
+          printf "window.TDR_CONFIG = {\n  functionsUrl: 'https://%s.supabase.co/functions/v1',\n  anonKey: '%s',\n};\n" "$REF" "$KEY" > web/config.js
+          echo "config.js points at project $REF"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web

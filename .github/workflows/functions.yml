@@ -13,6 +13,11 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase functions deploy --project-ref "${{ vars.SUPABASE_PROJECT_REF }}" --use-api
+      - name: Read project ref
+        run: |
+          REF="${{ vars.SUPABASE_PROJECT_REF }}"
+          [ -n "$REF" ] || REF=$(tr -d ' \n' < supabase/project-ref 2>/dev/null || true)
+          echo "REF=$REF" >> "$GITHUB_ENV"
+      - run: supabase functions deploy --project-ref "$REF" --use-api
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

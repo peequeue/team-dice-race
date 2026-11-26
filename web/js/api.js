@@ -16,7 +16,8 @@ async function post(fn, body) {
   const headers = { 'Content-Type': 'application/json' };
   if (cfg.anonKey) {
     headers.apikey = cfg.anonKey;
-    headers.Authorization = `Bearer ${cfg.anonKey}`;
+    // Legacy anon keys are JWTs and go in Authorization too; newer publishable keys don't.
+    if (cfg.anonKey.startsWith('eyJ')) headers.Authorization = `Bearer ${cfg.anonKey}`;
   }
   const res = await fetch(`${functionsUrl()}/${fn}`, { method: 'POST', headers, body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
