@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['supabase/project-ref', 'supabase/migrations/**']
+    paths: ['supabase/project-ref', 'supabase/migrations/**', '.github/workflows/setup.yml']
 
 jobs:
   setup:
@@ -70,8 +70,8 @@ jobs:
 
       - name: Function settings
         run: |
-          supabase secrets set --project-ref "$REF" \
+          supabase secrets set --yes --project-ref "$REF" \
             "CRON_SECRET=$CRON_SECRET" "ADMIN_BOOTSTRAP_TOKEN=$ADMIN_BOOTSTRAP_TOKEN" "ALLOWED_ORIGIN=$ORIGIN"
 
       - name: Server functions
-        run: supabase functions deploy --project-ref "$REF" --use-api
+        run: supabase functions deploy --yes --project-ref "$REF" --use-api

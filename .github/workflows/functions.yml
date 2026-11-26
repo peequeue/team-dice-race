@@ -18,6 +18,6 @@ jobs:
           REF="${{ vars.SUPABASE_PROJECT_REF }}"
           [ -n "$REF" ] || REF=$(tr -d ' \n' < supabase/project-ref 2>/dev/null || true)
           echo "REF=$REF" >> "$GITHUB_ENV"
-      - run: supabase functions deploy --project-ref "$REF" --use-api
+      - run: supabase functions deploy --yes --project-ref "$REF" --use-api
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
