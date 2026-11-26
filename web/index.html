@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Team Dice Race</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 8%22 shape-rendering=%22crispEdges%22%3E%3Crect width=%228%22 height=%228%22 fill=%22%23fff%22/%3E%3Crect x=%221%22 y=%221%22 width=%222%22 height=%222%22/%3E%3Crect x=%225%22 y=%225%22 width=%222%22 height=%222%22/%3E%3Crect x=%223%22 y=%223%22 width=%222%22 height=%222%22 fill=%22%23e84a4a%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>TEAM DICE RACE</h1>
+      <div class="meta">
+        <span id="season" class="pill"></span>
+        <span id="event" class="pill event" title=""></span>
+        <span id="countdown" class="pill countdown"></span>
+        <button id="howto" class="btn small ghost">How to play</button>
+        <button id="sound" class="btn small ghost">Sound: off</button>
+      </div>
+    </header>
+
+    <div id="welcome" class="welcomeov hidden"></div>
+
+    <div id="nolink" class="box hidden">
+      <h2>No link, no play</h2>
+      <p>This page needs your personal link from the host. It looks like <span class="note">.../#k=...</span></p>
+      <p><a class="btn gold" href="#demo" onclick="setTimeout(() => location.reload(), 0)">Try the demo</a></p>
+    </div>
+
+    <section id="standingsBox" class="box standings">
+      <div class="track" id="track">
+        <div class="hellzone">HELL</div>
+        <div class="rail"></div>
+        <div class="finish"></div>
+      </div>
+      <div class="ranks" id="ranks"></div>
+    </section>
+
+    <div id="game" class="main">
+      <div class="leftcol">
+        <section class="box boardwrap">
+          <canvas id="board"></canvas>
+          <div id="caption" class="caption"></div>
+          <div id="dice" class="dicebar"></div>
+          <p class="note boardhint">Tap a player or a square to see what it is.</p>
+          <div id="turnOv" class="cardov turnov tone-blue hidden">
+            <div class="cardbox">
+              <div class="cardhead">
+                <canvas id="turnAvatar"></canvas>
+                <div><div class="kicker">Your turn</div><h2 id="turnTitle"></h2></div>
+              </div>
+              <div id="turnBody"></div>
+              <div class="row" style="justify-content:center;margin-top:8px">
+                <button id="turnLater" class="btn small ghost">Look at the board first</button>
+              </div>
+            </div>
+          </div>
+          <button id="turnFab" class="btn gold turnfab hidden">YOUR TURN</button>
+          <div id="info" class="cardov infoov hidden">
+            <div class="cardbox">
+              <div class="cardhead">
+                <canvas id="infoAvatar"></canvas>
+                <div><div id="infoKicker" class="kicker"></div><h2 id="infoTitle"></h2></div>
+              </div>
+              <div id="infoBody" class="infobody"></div>
+              <div class="row" style="justify-content:flex-end"><button id="infoClose" class="btn small ghost">Close</button></div>
+            </div>
+          </div>
+          <div id="card" class="cardov hidden">
+            <div class="cardbox">
+              <div class="cardhead">
+                <canvas id="cardAvatar"></canvas>
+                <div><div id="cardKicker" class="kicker"></div><h2 id="cardTitle"></h2></div>
+              </div>
+              <div id="cardAnim" class="cardanim hidden"></div>
+              <div id="cardBody" class="cardbody"></div>
+              <p id="cardFoot" class="note"></p>
+              <div class="timer"><i id="cardTimer"></i></div>
+              <div class="row" style="justify-content:space-between">
+                <button id="cardNext" class="btn gold">Next</button>
+                <label class="note"><input type="checkbox" id="waitForMe"> Wait for me</label>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="box">
+          <div class="row" style="justify-content:space-between;margin:0 0 6px">
+            <h2 style="margin:0">Play by play</h2>
+            <button id="moreDays" class="btn small ghost">Earlier days</button>
+          </div>
+          <div id="history" class="history"><p class="note">Nothing yet. The first results land at 4pm.</p></div>
+        </section>
+      </div>
+
+      <aside class="side">
+        <section class="box">
+          <div class="me-card">
+            <canvas id="meAvatar"></canvas>
+            <div>
+              <h2 id="meName"></h2>
+              <div id="meWhere" class="note"></div>
+            </div>
+          </div>
+          <div id="meStats"></div>
+        </section>
+
+        <section class="box" id="turn"></section>
+
+        <section class="box">
+          <h2>Replays</h2>
+          <div class="replaybar">
+            <select id="days" aria-label="Pick a day"></select>
+            <button id="watch" class="btn small">Watch</button>
+            <button id="skip" class="btn small ghost">Skip</button>
+          </div>
+          <p id="replayNote" class="note"></p>
+        </section>
+
+        <section class="box hidden" id="demoBox">
+          <h2>Demo controls</h2>
+          <p class="note">You play against seven bots. Lock in, then skip to 4pm to see the dice.</p>
+          <div class="row"><button id="advance" class="btn gold">Skip to 4pm</button></div>
+          <p class="note">Skip without locking in to see what an auto-roll does.</p>
+          <h2 style="margin-top:12px">Test lab</h2>
+          <p class="note">Set yourself up to see a specific mechanic at the next 4pm.</p>
+          <select id="labPick" aria-label="Scenario" style="margin-bottom:6px"></select>
+          <div class="row"><button id="labGo" class="btn small gold">Set me up</button></div>
+          <p id="labNote" class="note ok"></p>
+          <select id="labEvent" aria-label="Today's event" style="margin-bottom:6px"></select>
+          <div class="row"><button id="labEventGo" class="btn small">Set today's event</button></div>
+          <div class="row" style="margin-top:12px">
+            <button id="newDemo" class="btn small red">New demo</button>
+            <label class="note"><input type="checkbox" id="demoSwap"> Swap on</label>
+            <label class="note"><input type="checkbox" id="peek"> Peek at trap doors</label>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

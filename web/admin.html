@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Team Dice Race: Host</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 8%22 shape-rendering=%22crispEdges%22%3E%3Crect width=%228%22 height=%228%22 fill=%22%23fff%22/%3E%3Crect x=%221%22 y=%221%22 width=%222%22 height=%222%22/%3E%3Crect x=%225%22 y=%225%22 width=%222%22 height=%222%22/%3E%3Crect x=%223%22 y=%223%22 width=%222%22 height=%222%22 fill=%22%23e84a4a%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>TEAM DICE RACE: HOST</h1>
+      <div class="meta"><span id="status" class="pill"></span><button id="refresh" class="btn small ghost">Refresh</button></div>
+    </header>
+
+    <section id="login" class="box hidden">
+      <h2>First-time setup</h2>
+      <p class="note">Enter the setup token you saved in Supabase as ADMIN_BOOTSTRAP_TOKEN. This works once and gives you your host link.</p>
+      <div class="row"><input type="text" id="bootToken" placeholder="Setup token"><button id="bootBtn" class="btn gold">Create host link</button></div>
+      <div id="bootOut"></div>
+      <h2 style="margin-top:16px">Already set up?</h2>
+      <p class="note">Open your saved host link. It ends in #k=...</p>
+    </section>
+
+    <div id="app" class="hidden">
+      <div class="grid2">
+        <section class="box" id="seasonBox"></section>
+        <section class="box" id="linksBox">
+          <h2>Player links</h2>
+          <p class="note">Links show here once, when created or replaced. Copy them straight away. Replacing a link stops the old one working.</p>
+          <div id="linksOut"></div>
+        </section>
+      </div>
+
+      <section class="box" style="margin-top:10px">
+        <h2>Players</h2>
+        <div id="players"></div>
+      </section>
+
+      <section class="box" style="margin-top:10px">
+        <h2>Full board <span class="note">(hidden trap doors shown dashed)</span></h2>
+        <canvas id="board" style="width:100%;max-width:640px;image-rendering:pixelated"></canvas>
+      </section>
+
+      <div class="grid2" style="margin-top:10px">
+        <section class="box">
+          <h2>1:1 time questions</h2>
+          <p class="note">Would-you-rather style questions for the 1:1 time decision. One per line: question | option A | option B | your pick (a or b). Questions are retired once shown.</p>
+          <textarea id="wyrBulk" placeholder="Beach or bush? | Beach | Bush | b"></textarea>
+          <div class="row"><button id="wyrAdd" class="btn">Add questions</button><span id="wyrCount" class="note"></span></div>
+          <div id="wyrList"></div>
+        </section>
+        <section class="box">
+          <h2>Days</h2>
+          <div id="days"></div>
+          <h2 style="margin-top:12px">Awards</h2>
+          <div id="awards"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

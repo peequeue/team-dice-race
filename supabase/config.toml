@@ -1,0 +1,12 @@
+# Supabase project config. Functions do their own auth (personal keys, cron secret),
+# so the platform JWT check is off.
+project_id = "team-dice-race"
+
+[functions.resolve]
+verify_jwt = false
+
+[functions.play]
+verify_jwt = false
+
+[functions.admin]
+verify_jwt = false

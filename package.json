@@ -1,0 +1,13 @@
+{
+  "name": "team-dice-race",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test 'engine/test/*.test.ts'",
+    "sim": "node engine/sim/simulate.ts 2000",
+    "build": "esbuild web/src/demo.ts --bundle --format=esm --target=es2020 --outfile=web/js/demo.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
